@@ -24,17 +24,20 @@ export default async function BlogIndex() {
       </p>
 
       {posts.length === 0 ? (
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-8 text-center">
-          <p className="text-gray-600">Aucun article publié pour le moment.</p>
-          <p className="mt-2">
-            <Link href="/generateur-facture" className="text-blue-600 hover:underline">
-              Créer une facture
+        <div className="max-w-4xl mx-auto py-20 px-4 text-center">
+          <div className="bg-blue-50 rounded-2xl p-12 border border-blue-100">
+            <h2 className="text-2xl font-bold text-blue-900 mb-4">Nos guides arrivent bientôt !</h2>
+            <p className="text-blue-700 mb-8">
+              Nous préparons des articles détaillés pour vous aider à maîtriser votre facturation. En attendant,
+              vous pouvez déjà utiliser notre outil gratuit.
+            </p>
+            <Link
+              href="/"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors"
+            >
+              Créer ma première facture
             </Link>
-            {" · "}
-            <Link href="/" className="text-blue-600 hover:underline">
-              Accueil
-            </Link>
-          </p>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
