@@ -1,0 +1,55 @@
+// Configuration du client et de la base de données
+// SQLite : démarrage rapide sans serveur. Pour PostgreSQL en prod, remplacer par :
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 1. Modèle pour les Articles de Blog (Guide/Tutos)
+model Post {
+  id         String   @id @default(cuid())
+  title      String
+  slug       String   @unique
+  excerpt    String   // Résumé pour les cartes et le SEO
+  content    String
+  published  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+  metaTitle  String?
+  metaDesc   String?
+
+  @@index([categoryId])
+  @@index([published, updatedAt])
+}
+
+model Category {
+  id    String @id @default(cuid())
+  name  String @unique
+  posts Post[]
+}
+
+// 2. Modèle pour les Pages de Niches / Modèles (Ex: Facture Freelance Tech)
+model TemplatePage {
+  id           String  @id @default(cuid())
+  title        String  // Ex: "Modèle de facture pour Micro-Entrepreneur"
+  slug         String  @unique
+  description  String // Texte descriptif sous le générateur
+  industry     String  // Secteur (Tech, Artisanat, Santé, etc.)
+  defaultNotes String? // Texte par défaut (ex: Mentions légales spécifiques)
+  isFeatured   Boolean @default(false)
+  metaTitle    String?
+  metaDesc     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([industry])
+  @@index([isFeatured])
+}

@@ -1,0 +1,22 @@
+# GL CAPITAL INVESTMENT- INSTRUCTIONS SYSTÈME ARCHITECTE
+
+## 1. Contexte du Projet
+- [cite_start]**Client :** GL Capital Investment SA[cite: 3].
+- [cite_start]**Secteur :** Structuration financière (SBLC, BG, Financement de projet)[cite: 4, 32].
+- [cite_start]**Priorité Absolue :** Crédibilité institutionnelle et conformité légale (Éliminer tout signal "SCAM")[cite: 5].
+
+## 2. Architecture Technique (Stack imposée)
+- [cite_start]**Frontend/Backend :** Next.js (App Router) + TypeScript.
+- [cite_start]**Base de données :** PostgreSQL via Prisma[cite: 283].
+- **UI :** React pur (JS/React) avec Tailwind CSS.
+
+## 3. Garde-fous de Conformité (STRICT)
+- [cite_start]**Zéro Promesse :** Ne jamais générer de textes mentionnant des rendements garantis ou fixes[cite: 41, 43].
+- [cite_start]**Identité :** Toujours préciser que GL Capital n'est PAS une banque et ne détient pas de licence bancaire[cite: 33, 145].
+- [cite_start]**Confidentialité :** Ne jamais afficher le nom des partenaires bancaires sur le portail client ; utiliser uniquement "Institution agréée"[cite: 213, 247].
+- [cite_start]**Langues :** Système i18n prêt pour le Français et l'Anglais[cite: 7].
+
+## 4. Instructions de Codage Automatisé
+- [cite_start]**Audit Log :** Toute action sensible (changement de statut de dossier, upload) doit inclure une fonction de log immuable[cite: 228, 303].
+- [cite_start]**Sécurité :** Utiliser des URLs signées pour tout document stocké dans le portail[cite: 239].
+- [cite_start]**Validation :** Utiliser Zod pour valider chaque formulaire (KYC, inscription) selon les champs du modèle de données.
