@@ -24,7 +24,7 @@ export default function ContactPage() {
           href="mailto:atoisoitlagloire@gmail.com"
           className="text-blue-600 font-medium hover:underline break-all"
         >
-          M'écrire ici
+          M&apos;écrire ici
         </a>
         <p className="text-gray-500 text-sm mt-4">
           Nous nous efforçons de répondre sous 48 h ouvrées.
