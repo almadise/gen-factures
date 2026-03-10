@@ -21,10 +21,10 @@ export default function ContactPage() {
           Pour toute demande, écrivez-nous à l&apos;adresse suivante :
         </p>
         <a
-          href="mailto:[Votre email professionnel]"
+          href="mailto:atoisoitlagloire@gmail.com"
           className="text-blue-600 font-medium hover:underline break-all"
         >
-          [Votre email professionnel]
+          M'écrire ici
         </a>
         <p className="text-gray-500 text-sm mt-4">
           Nous nous efforçons de répondre sous 48 h ouvrées.
