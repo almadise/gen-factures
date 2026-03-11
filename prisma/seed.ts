@@ -132,6 +132,28 @@ async function main() {
       metaTitle: "Facture multi-devises : euros, CHF, CAD",
       metaDesc: "Facturer en euros, francs suisses ou dollars. Bonnes pratiques.",
     },
+    {
+      title: "Comment facturer un client à l'étranger (Hors Union Européenne) ?",
+      slug: "facturation-client-hors-ue",
+      excerpt:
+        "TVA, mentions obligatoires, devise et frais bancaires : les règles essentielles pour facturer un client hors Union Européenne.",
+      content: `<p>Travailler avec des clients situés aux États-Unis, au Canada, au Royaume-Uni ou en Afrique est une opportunité majeure pour un freelance ou une PME. Cependant, la facturation internationale répond à des règles fiscales strictes, notamment en ce qui concerne la TVA.</p>
+<h2>1. L'exonération de TVA (Exportation)</h2>
+<p>La règle de base est simple : lorsque vous vendez un service ou un produit à un client situé en dehors de l'Union Européenne, vous facturez Hors Taxes (HT).</p>
+<p>En vertu de l'article 262 du CGI, les exportations sont exonérées de TVA. Cela signifie que vous ne devez pas collecter de TVA pour l'État français sur ces transactions.</p>
+<h2>2. La mention obligatoire à ne pas oublier</h2>
+<p>Pour que votre facture soit légale, vous devez justifier cette absence de taxe par une mention spécifique :</p>
+<p><strong>\"Exonération de TVA, article 262 du CGI (ou article 259-1 pour les services).\"</strong></p>
+<h2>3. Quelle devise utiliser ?</h2>
+<p>Vous pouvez facturer dans la devise de votre choix (Dollar, Euro, FCFA). Cependant, votre comptabilité doit toujours être tenue dans votre monnaie nationale.</p>
+<p><strong>Conseil :</strong> Précisez toujours le taux de change utilisé si vous facturez en devise étrangère pour éviter tout litige lors du paiement.</p>
+<h2>4. Moyens de paiement et frais bancaires</h2>
+<p>Les virements internationaux (SWIFT) peuvent engendrer des frais importants. Précisez bien dans vos conditions que les frais bancaires sont à la charge du client (clause \"OUR\") pour recevoir le montant exact de votre prestation.</p>`,
+      categoryId: conformite.id,
+      metaTitle: "Facturer un client hors UE : TVA et mentions obligatoires",
+      metaDesc:
+        "Guide pratique pour facturer un client hors Union Européenne : exonération de TVA, mentions obligatoires, devise et frais bancaires.",
+    },
   ];
 
   for (const post of posts) {
