@@ -7,6 +7,8 @@ export const metadata = {
     "Articles et guides pour bien facturer : freelance, auto-entrepreneur, TPE. Conseils et modèles.",
 };
 
+export const revalidate = 3600; // Le site vérifie s'il y a du nouveau contenu toutes les heures
+
 export default async function BlogPage() {
   const posts = await prisma.post.findMany({
     where: { published: true },

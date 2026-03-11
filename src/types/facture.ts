@@ -45,4 +45,6 @@ export interface DonneesFacture {
   /** Pied de page personnalisé (max 500 caractères) */
   footer?: string;
   showFooter?: boolean;
+  /** Micro-entrepreneur en franchise de TVA : pas de colonne TVA, mention art. 293 B, Total Net à payer */
+  isAutoEntrepreneur?: boolean;
 }

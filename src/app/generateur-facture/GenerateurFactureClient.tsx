@@ -73,6 +73,7 @@ export default function GenerateurFactureClient() {
   const [showFooter, setShowFooter] = useState(true);
   const [logoError, setLogoError] = useState<string | null>(null);
   const [templateTitle, setTemplateTitle] = useState<string | null>(null);
+  const [isAutoEntrepreneur, setIsAutoEntrepreneur] = useState(false);
   const searchParams = useSearchParams();
 
   // Préremplissage depuis une page niche (?template=slug)
@@ -155,6 +156,7 @@ export default function GenerateurFactureClient() {
     showLogo,
     footer: footer.slice(0, FOOTER_MAX_LENGTH),
     showFooter,
+    isAutoEntrepreneur,
   };
 
   const handleDownloadPdf = () => genererPdf(donnees);
@@ -522,6 +524,24 @@ export default function GenerateurFactureClient() {
         <div className="space-y-6">
           <div className="sticky top-4">
             <ApercuFacture data={donnees} />
+            <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-6">
+              <label className="flex items-center cursor-pointer gap-3">
+                <input
+                  type="checkbox"
+                  className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                  checked={isAutoEntrepreneur}
+                  onChange={(e) => setIsAutoEntrepreneur(e.target.checked)}
+                />
+                <div>
+                  <span className="block font-bold text-blue-900 text-sm">
+                    Je suis Micro-entrepreneur (Franchise de TVA)
+                  </span>
+                  <span className="block text-blue-700 text-xs">
+                    Ajoute automatiquement la mention &quot;TVA non applicable, art. 293 B du CGI&quot;
+                  </span>
+                </div>
+              </label>
+            </div>
             <button
               type="button"
               onClick={handleDownloadPdf}

@@ -29,6 +29,7 @@ export default function ApercuFacture({ data }: ApercuFactureProps) {
     totalTVA += (qte * pu) * (tva / 100);
   });
   const totalTTC = totalHT + totalTVA;
+  const isAutoEntrepreneur = data.isAutoEntrepreneur === true;
 
   const showLogo = data.showLogo !== false && data.logoBase64 && data.logoNaturalWidth && data.logoNaturalHeight;
   const { width: logoW, height: logoH } = showLogo
@@ -102,8 +103,12 @@ export default function ApercuFacture({ data }: ApercuFactureProps) {
               <th className="px-3 py-2 text-left font-semibold text-slate-700">Désignation</th>
               <th className="px-3 py-2 text-right font-semibold text-slate-700">Qté</th>
               <th className="px-3 py-2 text-right font-semibold text-slate-700">Prix unit.</th>
-              <th className="px-3 py-2 text-right font-semibold text-slate-700">TVA</th>
-              <th className="px-3 py-2 text-right font-semibold text-slate-700">Montant HT</th>
+              {!isAutoEntrepreneur && (
+                <th className="px-3 py-2 text-right font-semibold text-slate-700">TVA</th>
+              )}
+              <th className="px-3 py-2 text-right font-semibold text-slate-700">
+                {isAutoEntrepreneur ? "Montant" : "Montant HT"}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -117,7 +122,9 @@ export default function ApercuFacture({ data }: ApercuFactureProps) {
                   <td className="px-3 py-2 text-slate-800">{ligne.designation || "—"}</td>
                   <td className="px-3 py-2 text-right">{qte}</td>
                   <td className="px-3 py-2 text-right">{formatMontant(pu, data.devise)}</td>
-                  <td className="px-3 py-2 text-right">{tva} %</td>
+                  {!isAutoEntrepreneur && (
+                    <td className="px-3 py-2 text-right">{tva} %</td>
+                  )}
                   <td className="px-3 py-2 text-right">{formatMontant(mtHT, data.devise)}</td>
                 </tr>
               );
@@ -132,15 +139,24 @@ export default function ApercuFacture({ data }: ApercuFactureProps) {
             <span className="font-medium text-slate-600">Total HT :</span>{" "}
             {formatMontant(totalHT, data.devise)}
           </p>
-          <p>
-            <span className="font-medium text-slate-600">TVA :</span>{" "}
-            {formatMontant(totalTVA, data.devise)}
-          </p>
+          {!isAutoEntrepreneur && (
+            <p>
+              <span className="font-medium text-slate-600">TVA :</span>{" "}
+              {formatMontant(totalTVA, data.devise)}
+            </p>
+          )}
           <p className="text-lg font-bold text-slate-900">
-            Total TTC : {formatMontant(totalTTC, data.devise)}
+            Total {isAutoEntrepreneur ? "Net à payer" : "TTC"} :{" "}
+            {formatMontant(isAutoEntrepreneur ? totalHT : totalTTC, data.devise)}
           </p>
         </div>
       </div>
+
+      {isAutoEntrepreneur && (
+        <p className="mt-4 text-xs text-slate-500 italic">
+          TVA non applicable, art. 293 B du CGI.
+        </p>
+      )}
 
       {(data.conditionsPaiement || data.mentionsLegales) && (
         <div className="mt-4 border-t border-slate-100 pt-4 text-xs text-slate-500">

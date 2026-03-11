@@ -88,6 +88,7 @@ export function genererPdf(data: DonneesFacture): void {
       );
       y += 12;
 
+      const isAutoEntrepreneur = data.isAutoEntrepreneur === true;
       const lignesPourTable: string[][] = [];
       let totalHT = 0;
       let totalTVA = 0;
@@ -100,18 +101,29 @@ export function genererPdf(data: DonneesFacture): void {
         const mtTVA = mtHT * (tva / 100);
         totalHT += mtHT;
         totalTVA += mtTVA;
-        lignesPourTable.push([
-          l.designation || "—",
-          String(qte),
-          formatMontant(pu, data.devise),
-          `${tva} %`,
-          formatMontant(mtHT, data.devise),
-        ]);
+        if (isAutoEntrepreneur) {
+          lignesPourTable.push([
+            l.designation || "—",
+            String(qte),
+            formatMontant(pu, data.devise),
+            formatMontant(mtHT, data.devise),
+          ]);
+        } else {
+          lignesPourTable.push([
+            l.designation || "—",
+            String(qte),
+            formatMontant(pu, data.devise),
+            `${tva} %`,
+            formatMontant(mtHT, data.devise),
+          ]);
+        }
       });
 
       autoTable(doc, {
         startY: y,
-        head: [["Désignation", "Qté", "Prix unitaire", "TVA", "Montant HT"]],
+        head: [isAutoEntrepreneur
+          ? ["Désignation", "Qté", "Prix unitaire", "Montant"]
+          : ["Désignation", "Qté", "Prix unitaire", "TVA", "Montant HT"]],
         body: lignesPourTable,
         theme: "grid",
         headStyles: { fillColor: [14, 165, 233] },
@@ -125,11 +137,27 @@ export function genererPdf(data: DonneesFacture): void {
       doc.setFont("helvetica", "bold");
       doc.text(`Total HT : ${formatMontant(totalHT, data.devise)}`, 120, y);
       y += 6;
-      doc.text(`TVA : ${formatMontant(totalTVA, data.devise)}`, 120, y);
-      y += 6;
-      doc.text(`Total TTC : ${formatMontant(totalTTC, data.devise)}`, 120, y);
+      if (!isAutoEntrepreneur) {
+        doc.text(`TVA : ${formatMontant(totalTVA, data.devise)}`, 120, y);
+        y += 6;
+      }
+      doc.text(
+        `Total ${isAutoEntrepreneur ? "Net à payer" : "TTC"} : ${formatMontant(isAutoEntrepreneur ? totalHT : totalTTC, data.devise)}`,
+        120,
+        y
+      );
       doc.setFont("helvetica", "normal");
-      y += 14;
+      y += 10;
+
+      if (isAutoEntrepreneur) {
+        doc.setFontSize(9);
+        doc.setTextColor(75, 85, 99);
+        doc.text("TVA non applicable, art. 293 B du CGI.", MARGIN, y);
+        doc.setTextColor(0, 0, 0);
+        y += 10;
+      }
+
+      y += 4;
 
       if (data.conditionsPaiement) {
         doc.setFontSize(9);

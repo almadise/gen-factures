@@ -2,6 +2,12 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+function daysAgo(days: number): Date {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  return d;
+}
+
 async function main() {
   // 1. Créer les catégories
   const guide = await prisma.category.upsert({
@@ -24,8 +30,13 @@ async function main() {
     update: {},
     create: { name: "Freelance" },
   });
+  const guideFreelance = await prisma.category.upsert({
+    where: { name: "Guide Freelance" },
+    update: {},
+    create: { name: "Guide Freelance" },
+  });
 
-  // 2. Articles de blog (8 articles publiés)
+  // 2. Articles de blog
   const posts = [
     {
       title: "Mentions obligatoires sur une facture en France (2026)",
@@ -40,6 +51,7 @@ async function main() {
       categoryId: conformite.id,
       metaTitle: "Mentions obligatoires facture France 2026 | Guide complet",
       metaDesc: "Liste des mentions légales obligatoires sur une facture en France. Conformité 2026.",
+      createdAt: daysAgo(60),
     },
     {
       title: "Comment facturer en tant qu’auto-entrepreneur",
@@ -53,6 +65,7 @@ async function main() {
       categoryId: autoEntrepreneur.id,
       metaTitle: "Facturer en auto-entrepreneur : guide 2026",
       metaDesc: "Règles de facturation pour auto-entrepreneurs. Modèle conforme et gratuit.",
+      createdAt: daysAgo(52),
     },
     {
       title: "Délai de paiement et pénalités de retard",
@@ -66,6 +79,7 @@ async function main() {
       categoryId: conformite.id,
       metaTitle: "Délai de paiement et pénalités de retard | Facturation",
       metaDesc: "Délais de paiement légaux et pénalités de retard sur facture en France.",
+      createdAt: daysAgo(45),
     },
     {
       title: "Facture sans TVA : quand et comment l’appliquer ?",
@@ -78,6 +92,7 @@ async function main() {
       categoryId: conformite.id,
       metaTitle: "Facture sans TVA : exonération et franchise",
       metaDesc: "Quand et comment émettre une facture sans TVA. Mentions obligatoires.",
+      createdAt: daysAgo(38),
     },
     {
       title: "Facturation freelance : bonnes pratiques",
@@ -92,6 +107,7 @@ async function main() {
       categoryId: freelance.id,
       metaTitle: "Facturation freelance : guide des bonnes pratiques",
       metaDesc: "Comment bien facturer en freelance. Numérotation, délais, contenu de la facture.",
+      createdAt: daysAgo(31),
     },
     {
       title: "Créer une facture en moins de 2 minutes",
@@ -106,6 +122,7 @@ async function main() {
       categoryId: guide.id,
       metaTitle: "Créer une facture en 2 minutes | Tutoriel gratuit",
       metaDesc: "Générez une facture PDF conforme en 2 minutes. Sans inscription.",
+      createdAt: daysAgo(24),
     },
     {
       title: "Numéro de facture : règles et exemples",
@@ -119,6 +136,7 @@ async function main() {
       categoryId: guide.id,
       metaTitle: "Numéro de facture : règles et exemples 2026",
       metaDesc: "Comment numéroter ses factures. Exemples et conformité.",
+      createdAt: daysAgo(17),
     },
     {
       title: "Facture en euros, CHF ou CAD : multi-devises",
@@ -131,6 +149,7 @@ async function main() {
       categoryId: guide.id,
       metaTitle: "Facture multi-devises : euros, CHF, CAD",
       metaDesc: "Facturer en euros, francs suisses ou dollars. Bonnes pratiques.",
+      createdAt: daysAgo(10),
     },
     {
       title: "Comment facturer un client à l'étranger (Hors Union Européenne) ?",
@@ -153,6 +172,41 @@ async function main() {
       metaTitle: "Facturer un client hors UE : TVA et mentions obligatoires",
       metaDesc:
         "Guide pratique pour facturer un client hors Union Européenne : exonération de TVA, mentions obligatoires, devise et frais bancaires.",
+      createdAt: daysAgo(6),
+    },
+    {
+      title: "Facture Micro-Entrepreneur : Le guide des mentions spécifiques (TVA non applicable)",
+      slug: "facture-micro-entrepreneur-tva-non-applicable",
+      excerpt:
+        "Vous lancez votre micro-entreprise ? Découvrez comment facturer légalement sans TVA et la mention obligatoire indispensable pour éviter les amendes.",
+      content: `<p>Le régime de la micro-entreprise séduit par sa simplicité. Cependant, une erreur courante concerne la gestion de la Taxe sur la Valeur Ajoutée (TVA). En tant que micro-entrepreneur, vous bénéficiez généralement de la franchise en base de TVA. Voici comment rester en règle.</p>
+<h2>1. Pourquoi ne facturez-vous pas de TVA ?</h2>
+<p>Tant que votre chiffre d'affaires ne dépasse pas certains seuils (91 900 € pour la vente de marchandises ou 39 100 € pour les prestations de services en 2026), vous n'êtes pas assujetti à la TVA. Cela signifie que vous ne la facturez pas à vos clients, mais en contrepartie, vous ne pouvez pas la récupérer sur vos achats professionnels.</p>
+<h2>2. La mention obligatoire « Magique »</h2>
+<p>C'est le point le plus important. Si vous ne facturez pas de TVA, vous devez impérativement faire figurer cette mention sur TOUTES vos factures :</p>
+<p><strong>« TVA non applicable, art. 293 B du CGI »</strong></p>
+<p>Sans cette phrase, votre facture est considérée comme non conforme et vous vous exposez à une amende de 15 € par mention manquante.</p>
+<h2>3. Comment présenter vos prix ?</h2>
+<p>Sur votre facture, il ne doit y avoir aucune colonne « TVA ».</p>
+<ul>
+<li>Le prix unitaire doit être le prix final.</li>
+<li>Le total doit être indiqué en HT (Hors Taxes).</li>
+<li>Il est conseillé d'ajouter une ligne de total indiquant : « Net à payer ».</li>
+</ul>
+<h2>4. Que se passe-t-il si vous dépassez les seuils ?</h2>
+<p>Si votre activité explose (félicitations !), vous sortirez du dispositif de franchise. À ce moment-là, vous devrez :</p>
+<ul>
+<li>Demander un numéro de TVA intracommunautaire au service des impôts.</li>
+<li>Modifier vos modèles de factures pour inclure la TVA (20 % en général).</li>
+<li>Supprimer la mention « Art. 293 B ».</li>
+</ul>
+<h2>Conclusion</h2>
+<p>La simplicité est l'atout du micro-entrepreneur. En utilisant un outil adapté, vous vous assurez que ces mentions apparaissent automatiquement selon votre statut.</p>
+<p><strong>Pas envie de gérer les calculs et les mentions légales à la main ?</strong> <a href="/generateur-facture">Utilisez notre Générateur de Facture pour Micro-Entrepreneur</a> : cochez simplement l'option « Exonération TVA » et nous nous occupons du reste.</p>`,
+      categoryId: guideFreelance.id,
+      metaTitle: "Facture Micro-Entrepreneur : mentions TVA non applicable (art. 293 B)",
+      metaDesc: "Guide des mentions obligatoires pour facturer en micro-entreprise sans TVA. Évitez les amendes.",
+      createdAt: daysAgo(3),
     },
   ];
 
@@ -167,6 +221,7 @@ async function main() {
         published: true,
         metaTitle: post.metaTitle,
         metaDesc: post.metaDesc,
+        createdAt: post.createdAt,
       },
       create: {
         ...post,
