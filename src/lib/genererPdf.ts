@@ -158,13 +158,6 @@ export function genererPdf(data: DonneesFacture): void {
         });
       }
 
-      doc.setFontSize(8);
-      doc.text(
-        "Document généré en ligne. Aucune donnée n'a été stockée sur un serveur.",
-        MARGIN,
-        pageHeight - 10
-      );
-
       doc.save(`facture-${(data.numero || "export").replace(/\s/g, "-")}.pdf`);
     });
   });
