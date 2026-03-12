@@ -29,6 +29,16 @@ const colorPresets = [
   { name: "Orange", value: "#ea580c" },
 ];
 
+/** Normalise une couleur en #RRGGBB pour comparaison et envoi au PDF */
+function normalizeHex(hex: string): string {
+  const match = hex.match(/^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/);
+  if (!match) return "#000000";
+  let s = match[1];
+  if (s.length === 3)
+    s = s[0] + s[0] + s[1] + s[1] + s[2] + s[2];
+  return "#" + s.toLowerCase();
+}
+
 export default function InvoiceForm() {
   const [invoice, setInvoice] = useState<InvoiceData>({
     sender: "",
@@ -152,14 +162,14 @@ export default function InvoiceForm() {
       <div className="bg-gray-800 p-8 rounded-xl shadow-2xl text-left">
         <div
           className="bg-white min-h-[500px] p-10 text-gray-800 rounded shadow-inner overflow-hidden border-t-4"
-          style={{ borderTopColor: accentColor }}
+          style={{ borderTopColor: normalizeHex(accentColor) }}
         >
           <div className="flex justify-between items-start mb-10">
             <h1
               className="text-3xl font-black uppercase tracking-tighter italic px-3 py-1 rounded"
               style={{
-                backgroundColor: accentColor,
-                color: getContrastColor(accentColor),
+                backgroundColor: normalizeHex(accentColor),
+                color: getContrastColor(normalizeHex(accentColor)),
               }}
             >
               FACTURE
@@ -192,9 +202,9 @@ export default function InvoiceForm() {
               <tr
                 className="border-b-2"
                 style={{
-                  borderBottomColor: accentColor,
-                  backgroundColor: accentColor,
-                  color: getContrastColor(accentColor),
+                  borderBottomColor: normalizeHex(accentColor),
+                  backgroundColor: normalizeHex(accentColor),
+                  color: getContrastColor(normalizeHex(accentColor)),
                 }}
               >
                 <th className="text-left py-2">Description</th>
@@ -229,7 +239,7 @@ export default function InvoiceForm() {
               )}
               <div
                 className="flex justify-between text-sm font-bold border-t pt-2"
-                style={{ color: accentColor }}
+                style={{ color: normalizeHex(accentColor) }}
               >
                 <span>
                   Total {isAutoEntrepreneur ? "Net à payer" : "TTC"}:
@@ -277,7 +287,7 @@ export default function InvoiceForm() {
                 type="button"
                 onClick={() => setAccentColor(color.value)}
                 className={`h-10 w-10 rounded-full border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 ${
-                  accentColor === color.value
+                  normalizeHex(accentColor) === color.value
                     ? "border-gray-900 scale-110 shadow-md ring-2 ring-gray-300"
                     : "border-gray-200 hover:border-gray-300 hover:scale-105"
                 }`}
@@ -290,7 +300,7 @@ export default function InvoiceForm() {
               <input
                 type="color"
                 value={accentColor}
-                onChange={(e) => setAccentColor(e.target.value)}
+                onChange={(e) => setAccentColor(normalizeHex(e.target.value))}
                 className="h-9 w-9 cursor-pointer rounded-full border-0 bg-transparent p-0"
                 aria-label="Couleur personnalisée"
               />
@@ -302,10 +312,11 @@ export default function InvoiceForm() {
         </div>
 
         <PDFDownloadLink
+          key={`${normalizeHex(accentColor)}-${isAutoEntrepreneur}`}
           document={
             <InvoicePDF
               data={invoice}
-              accentColor={accentColor}
+              accentColor={normalizeHex(accentColor)}
               isAutoEntrepreneur={isAutoEntrepreneur}
             />
           }
