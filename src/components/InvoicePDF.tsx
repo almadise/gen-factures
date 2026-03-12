@@ -23,6 +23,14 @@ function getContrastColor(hex: string): string {
   return luminance > 0.5 ? "#000000" : "#ffffff";
 }
 
+function formatAmount(value: number): string {
+  const numeric = Number.isNaN(Number(value)) ? 0 : Number(value);
+  return numeric.toLocaleString("fr-FR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
 // Définition des styles pour le PDF (couleurs dynamiques via props)
 const styles = StyleSheet.create({
   page: { padding: 40, fontSize: 12, fontFamily: "Helvetica" },
@@ -58,7 +66,7 @@ const styles = StyleSheet.create({
   totalSection: { marginTop: 30, alignItems: "flex-end" },
   totalRow: {
     flexDirection: "row",
-    width: 150,
+    width: 220,
     justifyContent: "space-between",
     marginBottom: 5,
   },
@@ -156,7 +164,7 @@ export function InvoicePDF({
             <Text style={styles.colDesc}>{item.description || "—"}</Text>
             <Text style={styles.colQty}>{String(item.quantity)}</Text>
             <Text style={styles.colPrice}>
-              {Number(item.price).toFixed(2)} €
+              {formatAmount(Number(item.price))} €
             </Text>
           </View>
         ))}
@@ -164,12 +172,12 @@ export function InvoicePDF({
         <View style={styles.totalSection}>
           <View style={styles.totalRow}>
             <Text>Total HT:</Text>
-            <Text>{subTotal.toFixed(2)} €</Text>
+            <Text>{formatAmount(subTotal)} €</Text>
           </View>
           {!isAutoEntrepreneur && (
             <View style={styles.totalRow}>
               <Text>TVA ({data.taxRate}%):</Text>
-              <Text>{tax.toFixed(2)} €</Text>
+              <Text>{formatAmount(tax)} €</Text>
             </View>
           )}
           <View
@@ -178,7 +186,7 @@ export function InvoicePDF({
             <Text>
               Total {isAutoEntrepreneur ? "Net à payer" : "TTC"}:
             </Text>
-            <Text>{(subTotal + tax).toFixed(2)} €</Text>
+            <Text>{formatAmount(subTotal + tax)} €</Text>
           </View>
         </View>
 
