@@ -23,10 +23,10 @@ interface InvoiceData {
 
 const colorPresets = [
   { name: "Noir", value: "#000000" },
-  { name: "Bleu Pro", value: "#2563eb" },
-  { name: "Vert Succès", value: "#16a34a" },
-  { name: "Violet Expert", value: "#7c3aed" },
-  { name: "Rouge Énergie", value: "#dc2626" },
+  { name: "Bleu", value: "#2563eb" },
+  { name: "Vert", value: "#16a34a" },
+  { name: "Violet", value: "#7c3aed" },
+  { name: "Orange", value: "#ea580c" },
 ];
 
 export default function InvoiceForm() {
@@ -266,31 +266,38 @@ export default function InvoiceForm() {
           </label>
         </div>
 
-        <div className="space-y-3 mb-6 p-4 border rounded-xl bg-gray-50">
-          <label className="block text-sm font-bold text-gray-700">
-            Personnalisez la couleur de la facture
+        <div className="mb-6 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
+          <label className="mb-3 block text-sm font-semibold text-gray-800">
+            Couleur d&apos;accent du PDF
           </label>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             {colorPresets.map((color) => (
               <button
                 key={color.value}
                 type="button"
                 onClick={() => setAccentColor(color.value)}
-                className={`w-8 h-8 rounded-full border-2 transition-all ${
+                className={`h-10 w-10 rounded-full border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 ${
                   accentColor === color.value
-                    ? "border-black scale-110"
-                    : "border-transparent"
+                    ? "border-gray-900 scale-110 shadow-md ring-2 ring-gray-300"
+                    : "border-gray-200 hover:border-gray-300 hover:scale-105"
                 }`}
                 style={{ backgroundColor: color.value }}
                 title={color.name}
+                aria-label={color.name}
               />
             ))}
-            <input
-              type="color"
-              value={accentColor}
-              onChange={(e) => setAccentColor(e.target.value)}
-              className="w-8 h-8 p-0 border-none cursor-pointer rounded-full overflow-hidden"
-            />
+            <label className="flex cursor-pointer items-center gap-2 rounded-full border-2 border-dashed border-gray-300 p-0.5 transition-colors hover:border-gray-400">
+              <input
+                type="color"
+                value={accentColor}
+                onChange={(e) => setAccentColor(e.target.value)}
+                className="h-9 w-9 cursor-pointer rounded-full border-0 bg-transparent p-0"
+                aria-label="Couleur personnalisée"
+              />
+              <span className="pr-2 text-xs font-medium text-gray-500">
+                Personnalisée
+              </span>
+            </label>
           </div>
         </div>
 
