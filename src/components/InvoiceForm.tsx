@@ -21,13 +21,13 @@ interface InvoiceData {
   taxRate: number;
 }
 
-const ACCENT_PRESETS = [
+const colorPresets = [
   { name: "Noir", value: "#000000" },
-  { name: "Bleu", value: "#2563eb" },
-  { name: "Vert", value: "#16a34a" },
-  { name: "Violet", value: "#7c3aed" },
-  { name: "Orange", value: "#ea580c" },
-] as const;
+  { name: "Bleu Pro", value: "#2563eb" },
+  { name: "Vert Succès", value: "#16a34a" },
+  { name: "Violet Expert", value: "#7c3aed" },
+  { name: "Rouge Énergie", value: "#dc2626" },
+];
 
 export default function InvoiceForm() {
   const [invoice, setInvoice] = useState<InvoiceData>({
@@ -146,38 +146,6 @@ export default function InvoiceForm() {
           </button>
         </div>
 
-        <div className="space-y-3">
-          <label className="block text-sm font-medium text-gray-700">
-            Couleur d&apos;accentuation du PDF
-          </label>
-          <div className="flex flex-wrap items-center gap-3">
-            {ACCENT_PRESETS.map(({ name, value }) => (
-              <button
-                key={value}
-                type="button"
-                title={name}
-                onClick={() => setAccentColor(value)}
-                className={`h-9 w-9 rounded-full border-2 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 ${
-                  accentColor === value
-                    ? "border-slate-800 scale-110 shadow-md"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-                style={{ backgroundColor: value }}
-                aria-label={`Couleur ${name}`}
-              />
-            ))}
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="color"
-                value={accentColor}
-                onChange={(e) => setAccentColor(e.target.value)}
-                className="h-9 w-9 cursor-pointer rounded border border-gray-300 bg-white p-0.5"
-                aria-label="Couleur personnalisée"
-              />
-              <span className="text-xs text-gray-500">Personnalisée</span>
-            </label>
-          </div>
-        </div>
       </div>
 
       {/* --- APERÇU (À DROITE) --- */}
@@ -296,6 +264,34 @@ export default function InvoiceForm() {
               </span>
             </div>
           </label>
+        </div>
+
+        <div className="space-y-3 mb-6 p-4 border rounded-xl bg-gray-50">
+          <label className="block text-sm font-bold text-gray-700">
+            Personnalisez la couleur de la facture
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {colorPresets.map((color) => (
+              <button
+                key={color.value}
+                type="button"
+                onClick={() => setAccentColor(color.value)}
+                className={`w-8 h-8 rounded-full border-2 transition-all ${
+                  accentColor === color.value
+                    ? "border-black scale-110"
+                    : "border-transparent"
+                }`}
+                style={{ backgroundColor: color.value }}
+                title={color.name}
+              />
+            ))}
+            <input
+              type="color"
+              value={accentColor}
+              onChange={(e) => setAccentColor(e.target.value)}
+              className="w-8 h-8 p-0 border-none cursor-pointer rounded-full overflow-hidden"
+            />
+          </div>
         </div>
 
         <PDFDownloadLink
