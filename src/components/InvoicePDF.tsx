@@ -31,8 +31,8 @@ function formatAmount(value: number): string {
   });
 }
 
-// Définition des styles pour le PDF (couleurs dynamiques via props)
-const styles = StyleSheet.create({
+// Styles statiques
+const baseStyles = StyleSheet.create({
   page: { padding: 40, fontSize: 12, fontFamily: "Helvetica" },
   pageWithBorder: { borderTopWidth: 4 },
   header: {
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#f3f4f6",
     paddingVertical: 8,
   },
-  tableHeader: { fontWeight: "bold", borderBottomWidth: 2, paddingVertical: 8 },
+  tableHeaderBase: { fontWeight: "bold", borderBottomWidth: 2, paddingVertical: 8 },
   colDesc: { flex: 6 },
   colQty: { flex: 1, textAlign: "center" },
   colPrice: { flex: 2, textAlign: "right" },
@@ -79,6 +79,27 @@ const styles = StyleSheet.create({
   },
 });
 
+// Styles dynamiques selon la couleur d'accent (comme dans votre exemple)
+const dynamicStyles = (color: string) =>
+  StyleSheet.create({
+    headerBackground: {
+      backgroundColor: color,
+      color: getContrastColor(color),
+      padding: 20,
+      borderRadius: 4,
+    },
+    accentText: {
+      color: color,
+      fontWeight: "bold",
+    },
+    tableHeader: {
+      borderBottomWidth: 2,
+      borderBottomColor: color,
+      borderBottomStyle: "solid",
+      paddingBottom: 5,
+    },
+  });
+
 interface InvoicePDFProps {
   data: InvoicePDFData;
   accentColor: string;
@@ -95,32 +116,28 @@ export function InvoicePDF({
     0
   );
   const tax = isAutoEntrepreneur ? 0 : (subTotal * data.taxRate) / 100;
+  const s = dynamicStyles(accentColor);
   const textOnAccent = getContrastColor(accentColor);
 
   return (
     <Document>
       <Page
         size="A4"
-        style={[styles.page, styles.pageWithBorder, { borderTopColor: accentColor }]}
+        style={[
+          baseStyles.page,
+          baseStyles.pageWithBorder,
+          { borderTopColor: accentColor },
+        ]}
       >
-        <View style={styles.header}>
-          <Text
-            style={[
-              styles.title,
-              { backgroundColor: accentColor, color: textOnAccent },
-            ]}
-          >
-            FACTURE
-          </Text>
+        <View style={baseStyles.header}>
+          <View style={s.headerBackground}>
+            <Text style={{ fontSize: 24 }}>FACTURE</Text>
+          </View>
           <Text>N° {Math.floor(Math.random() * 10000)}</Text>
         </View>
 
         <View
-          style={{
-            borderBottomWidth: 2,
-            borderBottomColor: accentColor,
-            marginBottom: 24,
-          }}
+          style={[s.tableHeader, { marginBottom: 24 }]}
         />
 
         <View
@@ -131,57 +148,59 @@ export function InvoicePDF({
           }}
         >
           <View>
-            <Text style={styles.label}>De :</Text>
+            <Text style={baseStyles.label}>De :</Text>
             <Text>{data.sender || "Votre entreprise"}</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
-            <Text style={styles.label}>Pour :</Text>
+            <Text style={baseStyles.label}>Pour :</Text>
             <Text>{data.client || "Votre client"}</Text>
           </View>
         </View>
 
         <View
           style={[
-            styles.row,
-            styles.tableHeader,
+            baseStyles.row,
+            baseStyles.tableHeaderBase,
             {
               backgroundColor: accentColor,
               borderBottomColor: accentColor,
             },
           ]}
         >
-          <Text style={[styles.colDesc, { color: textOnAccent }]}>
-            Description
-          </Text>
-          <Text style={[styles.colQty, { color: textOnAccent }]}>Qté</Text>
-          <Text style={[styles.colPrice, { color: textOnAccent }]}>
+          <Text style={[baseStyles.colDesc, { color: textOnAccent }]}>Description</Text>
+          <Text style={[baseStyles.colQty, { color: textOnAccent }]}>Qté</Text>
+          <Text style={[baseStyles.colPrice, { color: textOnAccent }]}>
             Prix HT
           </Text>
         </View>
 
         {data.items.map((item, i) => (
-          <View key={i} style={styles.row}>
-            <Text style={styles.colDesc}>{item.description || "—"}</Text>
-            <Text style={styles.colQty}>{String(item.quantity)}</Text>
-            <Text style={styles.colPrice}>
+          <View key={i} style={baseStyles.row}>
+            <Text style={baseStyles.colDesc}>{item.description || "—"}</Text>
+            <Text style={baseStyles.colQty}>{String(item.quantity)}</Text>
+            <Text style={baseStyles.colPrice}>
               {formatAmount(Number(item.price))} €
             </Text>
           </View>
         ))}
 
-        <View style={styles.totalSection}>
-          <View style={styles.totalRow}>
+        <View style={baseStyles.totalSection}>
+          <View style={baseStyles.totalRow}>
             <Text>Total HT:</Text>
             <Text>{formatAmount(subTotal)} €</Text>
           </View>
           {!isAutoEntrepreneur && (
-            <View style={styles.totalRow}>
+            <View style={baseStyles.totalRow}>
               <Text>TVA ({data.taxRate}%):</Text>
               <Text>{formatAmount(tax)} €</Text>
             </View>
           )}
           <View
-            style={[styles.totalRow, styles.grandTotal, { color: accentColor }]}
+            style={[
+              baseStyles.totalRow,
+              baseStyles.grandTotal,
+              s.accentText,
+            ]}
           >
             <Text>
               Total {isAutoEntrepreneur ? "Net à payer" : "TTC"}:
@@ -191,7 +210,7 @@ export function InvoicePDF({
         </View>
 
         {isAutoEntrepreneur && (
-          <Text style={styles.legalNotice}>
+          <Text style={baseStyles.legalNotice}>
             TVA non applicable, art. 293 B du CGI.
           </Text>
         )}
