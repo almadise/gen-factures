@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npx next dev",
-    "build": "node scripts/ensure-db-url.js && npx next build",
+    "build": "node scripts/ensure-db-url.js && node scripts/run-db-push-seed-if-url.js && npx next build",
     "build:full": "prisma generate && prisma db push && npm run db:seed && npx next build",
     "start": "npx next start",
     "lint": "npx next lint",

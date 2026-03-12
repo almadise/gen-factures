@@ -22,8 +22,11 @@ export default async function BlogPage() {
       orderBy: { createdAt: "desc" },
       include: { category: true },
     });
-  } catch {
-    // Base indisponible au build ou à la requête
+  } catch (err) {
+    console.error(
+      "[Blog] Impossible de charger les articles. Vérifiez DATABASE_URL sur Vercel.",
+      err
+    );
   }
 
   return (
