@@ -14,15 +14,30 @@ export interface InvoicePDFData {
   taxRate: number;
 }
 
-// Définition des styles pour le PDF (proche du rendu Tailwind)
+function getContrastColor(hex: string): string {
+  const n = parseInt(hex.slice(1), 16);
+  const r = (n >> 16) & 0xff;
+  const g = (n >> 8) & 0xff;
+  const b = n & 0xff;
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? "#000000" : "#ffffff";
+}
+
+// Définition des styles pour le PDF (couleurs dynamiques via props)
 const styles = StyleSheet.create({
   page: { padding: 40, fontSize: 12, fontFamily: "Helvetica" },
+  pageWithBorder: { borderTopWidth: 4 },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 40,
   },
-  title: { fontSize: 24, fontWeight: "bold", color: "#2563eb" },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
   section: { marginBottom: 20 },
   label: {
     fontSize: 10,
@@ -36,11 +51,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#f3f4f6",
     paddingVertical: 8,
   },
-  tableHeader: {
-    fontWeight: "bold",
-    borderBottomColor: "#1f2937",
-    borderBottomWidth: 2,
-  },
+  tableHeader: { fontWeight: "bold", borderBottomWidth: 2, paddingVertical: 8 },
   colDesc: { flex: 6 },
   colQty: { flex: 1, textAlign: "center" },
   colPrice: { flex: 2, textAlign: "right" },
@@ -51,27 +62,58 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 5,
   },
-  grandTotal: { color: "#2563eb", fontWeight: "bold", fontSize: 14 },
+  grandTotal: { fontWeight: "bold", fontSize: 14 },
+  legalNotice: {
+    fontSize: 9,
+    marginTop: 20,
+    fontStyle: "italic",
+    color: "#4b5563",
+  },
 });
 
 interface InvoicePDFProps {
   data: InvoicePDFData;
+  accentColor: string;
+  isAutoEntrepreneur: boolean;
 }
 
-export function InvoicePDF({ data }: InvoicePDFProps) {
+export function InvoicePDF({
+  data,
+  accentColor,
+  isAutoEntrepreneur,
+}: InvoicePDFProps) {
   const subTotal = data.items.reduce(
     (acc, item) => acc + item.quantity * item.price,
     0
   );
-  const tax = (subTotal * data.taxRate) / 100;
+  const tax = isAutoEntrepreneur ? 0 : (subTotal * data.taxRate) / 100;
+  const textOnAccent = getContrastColor(accentColor);
 
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
+      <Page
+        size="A4"
+        style={[styles.page, styles.pageWithBorder, { borderTopColor: accentColor }]}
+      >
         <View style={styles.header}>
-          <Text style={styles.title}>FACTURE</Text>
+          <Text
+            style={[
+              styles.title,
+              { backgroundColor: accentColor, color: textOnAccent },
+            ]}
+          >
+            FACTURE
+          </Text>
           <Text>N° {Math.floor(Math.random() * 10000)}</Text>
         </View>
+
+        <View
+          style={{
+            borderBottomWidth: 2,
+            borderBottomColor: accentColor,
+            marginBottom: 24,
+          }}
+        />
 
         <View
           style={{
@@ -90,10 +132,23 @@ export function InvoicePDF({ data }: InvoicePDFProps) {
           </View>
         </View>
 
-        <View style={[styles.row, styles.tableHeader]}>
-          <Text style={styles.colDesc}>Description</Text>
-          <Text style={styles.colQty}>Qté</Text>
-          <Text style={styles.colPrice}>Prix HT</Text>
+        <View
+          style={[
+            styles.row,
+            styles.tableHeader,
+            {
+              backgroundColor: accentColor,
+              borderBottomColor: accentColor,
+            },
+          ]}
+        >
+          <Text style={[styles.colDesc, { color: textOnAccent }]}>
+            Description
+          </Text>
+          <Text style={[styles.colQty, { color: textOnAccent }]}>Qté</Text>
+          <Text style={[styles.colPrice, { color: textOnAccent }]}>
+            Prix HT
+          </Text>
         </View>
 
         {data.items.map((item, i) => (
@@ -111,15 +166,27 @@ export function InvoicePDF({ data }: InvoicePDFProps) {
             <Text>Total HT:</Text>
             <Text>{subTotal.toFixed(2)} €</Text>
           </View>
-          <View style={styles.totalRow}>
-            <Text>TVA ({data.taxRate}%):</Text>
-            <Text>{tax.toFixed(2)} €</Text>
-          </View>
-          <View style={[styles.totalRow, styles.grandTotal]}>
-            <Text>Total TTC:</Text>
+          {!isAutoEntrepreneur && (
+            <View style={styles.totalRow}>
+              <Text>TVA ({data.taxRate}%):</Text>
+              <Text>{tax.toFixed(2)} €</Text>
+            </View>
+          )}
+          <View
+            style={[styles.totalRow, styles.grandTotal, { color: accentColor }]}
+          >
+            <Text>
+              Total {isAutoEntrepreneur ? "Net à payer" : "TTC"}:
+            </Text>
             <Text>{(subTotal + tax).toFixed(2)} €</Text>
           </View>
         </View>
+
+        {isAutoEntrepreneur && (
+          <Text style={styles.legalNotice}>
+            TVA non applicable, art. 293 B du CGI.
+          </Text>
+        )}
       </Page>
     </Document>
   );

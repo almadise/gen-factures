@@ -4,6 +4,15 @@ import React, { useState } from "react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { InvoicePDF } from "@/components/InvoicePDF";
 
+function getContrastColor(hex: string): string {
+  const n = parseInt(hex.slice(1), 16);
+  const r = (n >> 16) & 0xff;
+  const g = (n >> 8) & 0xff;
+  const b = n & 0xff;
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? "#000000" : "#ffffff";
+}
+
 // Structure de données de la facture
 interface InvoiceData {
   sender: string;
@@ -12,6 +21,14 @@ interface InvoiceData {
   taxRate: number;
 }
 
+const ACCENT_PRESETS = [
+  { name: "Noir", value: "#000000" },
+  { name: "Bleu", value: "#2563eb" },
+  { name: "Vert", value: "#16a34a" },
+  { name: "Violet", value: "#7c3aed" },
+  { name: "Orange", value: "#ea580c" },
+] as const;
+
 export default function InvoiceForm() {
   const [invoice, setInvoice] = useState<InvoiceData>({
     sender: "",
@@ -19,13 +36,17 @@ export default function InvoiceForm() {
     items: [{ description: "", quantity: 1, price: 0 }],
     taxRate: 20,
   });
+  const [accentColor, setAccentColor] = useState("#000000");
+  const [isAutoEntrepreneur, setIsAutoEntrepreneur] = useState(false);
 
   // Calculs automatiques
   const subTotal = invoice.items.reduce(
     (acc, item) => acc + item.quantity * item.price,
     0
   );
-  const taxAmount = (subTotal * invoice.taxRate) / 100;
+  const taxAmount = isAutoEntrepreneur
+    ? 0
+    : (subTotal * invoice.taxRate) / 100;
   const total = subTotal + taxAmount;
 
   // Fonctions pour modifier les items
@@ -124,13 +145,55 @@ export default function InvoiceForm() {
             + Ajouter une ligne
           </button>
         </div>
+
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-gray-700">
+            Couleur d&apos;accentuation du PDF
+          </label>
+          <div className="flex flex-wrap items-center gap-3">
+            {ACCENT_PRESETS.map(({ name, value }) => (
+              <button
+                key={value}
+                type="button"
+                title={name}
+                onClick={() => setAccentColor(value)}
+                className={`h-9 w-9 rounded-full border-2 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 ${
+                  accentColor === value
+                    ? "border-slate-800 scale-110 shadow-md"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+                style={{ backgroundColor: value }}
+                aria-label={`Couleur ${name}`}
+              />
+            ))}
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="color"
+                value={accentColor}
+                onChange={(e) => setAccentColor(e.target.value)}
+                className="h-9 w-9 cursor-pointer rounded border border-gray-300 bg-white p-0.5"
+                aria-label="Couleur personnalisée"
+              />
+              <span className="text-xs text-gray-500">Personnalisée</span>
+            </label>
+          </div>
+        </div>
       </div>
 
       {/* --- APERÇU (À DROITE) --- */}
       <div className="bg-gray-800 p-8 rounded-xl shadow-2xl text-left">
-        <div className="bg-white min-h-[500px] p-10 text-gray-800 rounded shadow-inner overflow-hidden">
+        <div
+          className="bg-white min-h-[500px] p-10 text-gray-800 rounded shadow-inner overflow-hidden border-t-4"
+          style={{ borderTopColor: accentColor }}
+        >
           <div className="flex justify-between items-start mb-10">
-            <h1 className="text-3xl font-black uppercase tracking-tighter text-blue-600 italic">
+            <h1
+              className="text-3xl font-black uppercase tracking-tighter italic px-3 py-1 rounded"
+              style={{
+                backgroundColor: accentColor,
+                color: getContrastColor(accentColor),
+              }}
+            >
               FACTURE
             </h1>
             <div className="text-right text-sm">
@@ -157,8 +220,15 @@ export default function InvoiceForm() {
           </div>
 
           <table className="w-full text-sm mb-10">
-            <thead className="border-b-2 border-gray-100">
-              <tr>
+            <thead>
+              <tr
+                className="border-b-2"
+                style={{
+                  borderBottomColor: accentColor,
+                  backgroundColor: accentColor,
+                  color: getContrastColor(accentColor),
+                }}
+              >
                 <th className="text-left py-2">Description</th>
                 <th className="text-center py-2">Qté</th>
                 <th className="text-right py-2">Prix</th>
@@ -183,20 +253,59 @@ export default function InvoiceForm() {
                 <span>Total HT:</span>
                 <span>{subTotal.toFixed(2)} €</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span>TVA ({invoice.taxRate}%):</span>
-                <span>{taxAmount.toFixed(2)} €</span>
-              </div>
-              <div className="flex justify-between text-sm font-bold text-blue-600 border-t pt-2">
-                <span>Total TTC:</span>
+              {!isAutoEntrepreneur && (
+                <div className="flex justify-between text-sm">
+                  <span>TVA ({invoice.taxRate}%):</span>
+                  <span>{taxAmount.toFixed(2)} €</span>
+                </div>
+              )}
+              <div
+                className="flex justify-between text-sm font-bold border-t pt-2"
+                style={{ color: accentColor }}
+              >
+                <span>
+                  Total {isAutoEntrepreneur ? "Net à payer" : "TTC"}:
+                </span>
                 <span>{total.toFixed(2)} €</span>
               </div>
             </div>
           </div>
+
+          {isAutoEntrepreneur && (
+            <p className="mt-4 text-xs italic text-gray-600 text-left">
+              TVA non applicable, art. 293 B du CGI.
+            </p>
+          )}
+        </div>
+
+        <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 mt-6">
+          <label className="flex items-center cursor-pointer gap-3">
+            <input
+              type="checkbox"
+              className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+              checked={isAutoEntrepreneur}
+              onChange={(e) => setIsAutoEntrepreneur(e.target.checked)}
+            />
+            <div>
+              <span className="block font-bold text-blue-900 text-sm">
+                Je suis Micro-entrepreneur (Franchise de TVA)
+              </span>
+              <span className="block text-blue-700 text-xs">
+                Ajoute automatiquement la mention &quot;TVA non applicable,
+                art. 293 B du CGI&quot;
+              </span>
+            </div>
+          </label>
         </div>
 
         <PDFDownloadLink
-          document={<InvoicePDF data={invoice} />}
+          document={
+            <InvoicePDF
+              data={invoice}
+              accentColor={accentColor}
+              isAutoEntrepreneur={isAutoEntrepreneur}
+            />
+          }
           fileName={`facture-${new Date().getTime()}.pdf`}
           className="w-full mt-6 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg shadow-lg flex justify-center items-center gap-2 transition-transform active:scale-95"
         >
