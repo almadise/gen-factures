@@ -1,22 +1,26 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://votre-site.com";
 
-  // 1. Récupérer tous les articles de blog
-  const posts = await prisma.post.findMany({
-    where: { published: true },
-    select: { slug: true, updatedAt: true },
-  });
+  let posts: { slug: string; updatedAt: Date }[] = [];
+  let templates: { slug: string }[] = [];
+  try {
+    posts = await prisma.post.findMany({
+      where: { published: true },
+      select: { slug: true, updatedAt: true },
+    });
+    templates = await prisma.templatePage.findMany({
+      select: { slug: true },
+    });
+  } catch {
+    // Base indisponible au build : on retourne uniquement les pages statiques
+  }
 
-  // 2. Récupérer toutes les pages de niches
-  const templates = await prisma.templatePage.findMany({
-    select: { slug: true },
-  });
-
-  // 3. Pages statiques (Accueil, Blog, À propos, Contact, Mentions légales, Confidentialité)
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: new Date() },
     { url: `${baseUrl}/blog`, lastModified: new Date() },

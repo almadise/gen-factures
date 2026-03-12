@@ -1,12 +1,18 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
-  // 1. Récupération des niches mises en avant (isFeatured)
-  const featuredTemplates = await prisma.templatePage.findMany({
-    where: { isFeatured: true },
-    take: 4, // On en prend 4 pour l'affichage
-  });
+  let featuredTemplates: Awaited<ReturnType<typeof prisma.templatePage.findMany>> = [];
+  try {
+    featuredTemplates = await prisma.templatePage.findMany({
+      where: { isFeatured: true },
+      take: 4,
+    });
+  } catch {
+    // Base indisponible au build ou à la requête : affichage sans templates
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
