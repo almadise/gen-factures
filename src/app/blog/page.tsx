@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/prisma";
+import type { Post } from "@prisma/client";
 import BlogCard from "@/components/BlogCard";
+
+type PostWithCategory = Post & { category: { name: string } | null };
 
 export const metadata = {
   title: "Blog — Guides et articles sur la facturation",
@@ -12,11 +15,7 @@ export const revalidate = 3600;
 export const dynamic = "force-dynamic";
 
 export default async function BlogPage() {
-  let posts: Awaited<
-    ReturnType<
-      typeof prisma.post.findMany<{ include: { category: true } }
-    >
-  > = [];
+  let posts: PostWithCategory[] = [];
   try {
     posts = await prisma.post.findMany({
       where: { published: true },
